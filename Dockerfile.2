@@ -1,0 +1,59 @@
+FROM geographica/gdal2:2.3.1
+#FROM geodata/gdal:latest
+
+# Java install, based on https://github.com/anapsix/docker-oracle-java8
+# Python install based on https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get
+
+# UTF-8 all the things
+RUN apt-get clean && apt-get update && apt-get install -y locales
+RUN locale-gen en_US.UTF-8
+
+# ENVs
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+ENV SCALA_VERSION 2.12.6
+ENV SBT_VERSION 1.2.0
+
+# python3 repos
+RUN add-apt-repository ppa:deadsnakes/ppa
+
+# java repos
+RUN echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
+
+RUN apt-get update
+
+RUN apt-get install -y locales curl python3-pip
+RUN pip3 install --upgrade pip awscli
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends oracle-java8-installer
+
+# Install Scala
+RUN \
+  curl -fsL https://downloads.typesafe.com/scala/$SCALA_VERSION/scala-$SCALA_VERSION.tgz | tar xfz - -C /root/ && \
+  echo >> /root/.bashrc && \
+  echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
+
+# Install sbt
+RUN \
+  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
+  dpkg -i sbt-$SBT_VERSION.deb && \
+  rm sbt-$SBT_VERSION.deb && \
+  apt-get install sbt && \
+  sbt sbtVersion
+
+# Scala expects this file
+RUN mkdir -p /usr/lib/jvm/java-8-openjdk-amd64 && touch /usr/lib/jvm/java-8-openjdk-amd64/release
+
+# Cleanup
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get autoremove -y
+RUN apt-get clean all
+
+# Externally accessible data is by default put in /data
+WORKDIR /data
+VOLUME ["/data"]
+
+# Output version and capabilities by default.
+CMD gdalinfo --version && gdalinfo --formats && java -version && javac -version && sbt sbtVersion
