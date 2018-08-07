@@ -11,9 +11,9 @@ This Dockerfile creates and image with the following:
 ## Provenance
 * GDAL based mostly on [geographica/gdal2](https://github.com/GeographicaGS/Docker-GDAL2), and to a lesser extent 
   [geodata/gdal](https://github.com/geo-data/gdal-docker)
-# Java install based on [https://github.com/anapsix/docker-oracle-java8]
-# Scala/SBT install based on [hseeberger/scala-sbt](https://github.com/hseeberger/scala-sbt)
-# Python install based on [https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get]
+* Java install based on [https://github.com/anapsix/docker-oracle-java8]
+* Scala/SBT install based on [hseeberger/scala-sbt](https://github.com/hseeberger/scala-sbt)
+* Python install based on [https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get]
 
 ## Usage
 
