@@ -12,8 +12,10 @@ RUN \
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV ROOTDIR /usr/local/
+# OPENJPEG versions prior to 2.3.0 have problems processing large jp2 files
+# https://lists.osgeo.org/pipermail/gdal-dev/2017-October/047397.html
+ENV OPENJPEG_VERSION 2.3.0
 ENV GDAL_VERSION 2.3.1
-ENV OPENJPEG_VERSION 2.2.0
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 ENV SCALA_VERSION 2.12.6
 ENV SBT_VERSION 1.2.0

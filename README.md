@@ -17,6 +17,19 @@ This Dockerfile creates and image with the following:
 
 ## Usage
 
+### Build
+
+    $ docker build .
+    Sending build context to Docker daemon  105.5kB
+    Step 1/27 : FROM ubuntu:xenial
+    ...
+    Successfully built d99b3a9a1ba3
+    $ docker tag d99b3a9a1ba3 s22s/geo-swak:latest
+    $ docker push s22s/geo-swak
+    
+
+### Run
+
 Running the container without any arguments will by default output the GDAL
 version string as well as the supported raster and vector formats:
 
