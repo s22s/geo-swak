@@ -2,7 +2,7 @@
 
 This Dockerfile creates and image with the following:
 * Ubuntu 16.04 (Xenial Xerus)
-* GDAL compiled with JPEG200 support via OpenJPEG
+* GDAL compiled with JPEG2000 support via OpenJPEG
 * JRE 8
 * Scala and SBT
 * Python 3
