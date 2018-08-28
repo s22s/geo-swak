@@ -3,7 +3,6 @@
 sudo yum update -y
 sudo yum install -y docker
 sudo service docker start
-sudo systemctl enable docker
 sudo usermod -a -G docker ec2-user
 
 device0="/dev/nvme1n1"
@@ -18,7 +17,8 @@ then
     sudo mount -a
     sudo chmod 777 ${mntpnt0}
 else
-    echo "${device0} does not exist"
+    echo "${device0} does not exist!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
 fi
 
 sudo reboot
