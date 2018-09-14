@@ -8,6 +8,8 @@ This Dockerfile creates and image with the following:
 * Python 3
 * AWS CLI
 
+Images generated from this build are published to [https://hub.docker.com/r/s22s/geo-swak]
+
 ## Provenance
 * GDAL based mostly on [geographica/gdal2](https://github.com/GeographicaGS/Docker-GDAL2), and to a lesser extent 
   [geodata/gdal](https://github.com/geo-data/gdal-docker)
