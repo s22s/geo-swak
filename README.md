@@ -59,3 +59,45 @@ time the image was built*. If you want to include the most up-to-date commits
 then you need to build the docker image yourself locally along these lines:
 
     docker build -t s22s/geo-swak:local git://github.com/geo-data/gdal-docker/
+    
+Bash functions can make the GDAL tools run as if they were installed locally.  Add this to your 
+.bashrc (or .bash_profile, if .bash_profile does not source your .bashrc):
+
+```bash
+############################
+# start geo-swak functions #
+############################
+
+function g {
+  docker run -v $(pwd):/data s22s/geo-swak "$@"
+}
+
+function gdalinfo {
+  g gdalinfo "$@"
+}
+
+function gdal_translate {
+  g gdal_translate "$@"
+}
+
+function gdalwarp {
+  g gdalwarp "$@"
+}
+
+function ogr2ogr {
+  g ogr2ogr "$@"
+}
+
+function ogrinfo {
+  g ogrinfo "$@"
+}
+
+##########################
+# end geo-swak functions #
+##########################
+```    
+
+With this, you can just run commands like `gdalinfo band1.tif`, and it will run that command inside the docker container.  
+functions can be added for other commands, or they can be run with a command like `g gdalinfo band1.tif`.
+If the file are in a directory other than one below the pwd, then then volume mount (-v) as part of the command will need
+to be modified. 
