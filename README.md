@@ -43,7 +43,11 @@ with GDAL available:
     docker run -t -i s22s/geo-swak /bin/bash
 
 You will most likely want to work with data on the host system from within the
-docker container, in which case run the container with the -v option. Assuming
+docker container, in which case run the container with the -v option. 
+
+    docker run -t -i -v $(pwd):/data s22s/geo-swak /bin/bash 
+
+Assuming
 you have a raster called `test.tif` in your current working directory on your
 host system, running the following command should invoke `gdalinfo` on
 `test.tif`:
@@ -69,7 +73,7 @@ Bash functions can make the GDAL tools run as if they were installed locally.  A
 ############################
 
 function g {
-  docker run -v $(pwd):/data s22s/geo-swak "$@"
+  docker run -it -v $(pwd):/data s22s/geo-swak "$@"
 }
 
 function gdalinfo {
