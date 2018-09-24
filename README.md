@@ -40,19 +40,19 @@ version string as well as the supported raster and vector formats:
 The following command will open a bash shell in an Ubuntu based environment
 with GDAL available:
 
-    docker run -t -i s22s/geo-swak /bin/bash
+    docker run -it s22s/geo-swak /bin/bash
 
 You will most likely want to work with data on the host system from within the
 docker container, in which case run the container with the -v option. 
 
-    docker run -t -i -v $(pwd):/data s22s/geo-swak /bin/bash 
+    docker run -it -v $(pwd):/data s22s/geo-swak /bin/bash 
 
 Assuming
 you have a raster called `test.tif` in your current working directory on your
 host system, running the following command should invoke `gdalinfo` on
 `test.tif`:
 
-    docker run -v $(pwd):/data s22s/geo-swak gdalinfo test.tif
+    docker run -it -v $(pwd):/data s22s/geo-swak gdalinfo test.tif
 
 This works because the current working directory is set to `/data` in the
 container, and you have mapped the current working directory on your host to
