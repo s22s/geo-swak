@@ -2,8 +2,8 @@
 
 This Dockerfile creates and image with the following:
 * Ubuntu 16.04 (Xenial Xerus)
-* GDAL compiled with JPEG2000 support via OpenJPEG
-* JRE 8
+* GDAL, compiled with HDF4, HDF5, and JPEG2000 (OpenJPEG) support
+* Java JRE 8
 * Scala and SBT
 * Python 3
 * AWS CLI
@@ -28,7 +28,6 @@ Images generated from this build are published to [https://hub.docker.com/r/s22s
     Successfully built d99b3a9a1ba3
     $ docker tag d99b3a9a1ba3 s22s/geo-swak:latest
     $ docker push s22s/geo-swak
-    
 
 ### Run
 
