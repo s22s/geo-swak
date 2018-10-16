@@ -21,12 +21,12 @@ Images generated from this build are published to [https://hub.docker.com/r/s22s
 
 ### Build
 
-    $ docker build .
+    $ docker build -t s22s/geo-swak:latest . 
     Sending build context to Docker daemon  105.5kB
     Step 1/27 : FROM ubuntu:xenial
     ...
-    Successfully built d99b3a9a1ba3
-    $ docker tag d99b3a9a1ba3 s22s/geo-swak:latest
+    Successfully built ea85116c15b1
+    Successfully tagged s22s/geo-swak:latest
     $ docker push s22s/geo-swak
 
 ### Run
