@@ -1,9 +1,9 @@
-# Astraea gdal/java/python container image
-FROM ubuntu:xenial
+# Geospatial Swiss Army Knife image
+FROM ubuntu:cosmic
 
 # UTF-8 all the things
 RUN \
-    apt-get clean -y && apt-get update && \
+    apt-get clean -y && apt-get update -y && \
     apt-get install -y apt-utils locales && \
     locale-gen en_US.UTF-8 && \
     apt-get clean all
@@ -25,7 +25,7 @@ ENV SBT_VERSION 1.2.4
 WORKDIR $ROOTDIR/
 
 RUN \
-    apt-get install -y software-properties-common python-software-properties python3-software-properties && \
+    apt-get install -y software-properties-common python3-software-properties && \
     apt-get clean all
 
 RUN \
@@ -53,24 +53,33 @@ RUN \
         bash-completion \
         cmake \
         imagemagick \
+        libpng-dev \
+        wget \
     && apt-get clean all
 
+# Install Pip and AWS CLI
 RUN pip3 install --upgrade pip awscli
 
 # Compile and install OpenJPEG for GDAL
-ADD https://github.com/uclouvain/openjpeg/archive/v${OPENJPEG_VERSION}.tar.gz $ROOTDIR/src/openjpeg-${OPENJPEG_VERSION}.tar.gz
 RUN \
-    cd src && tar -xvf openjpeg-${OPENJPEG_VERSION}.tar.gz && cd openjpeg-${OPENJPEG_VERSION}/ \
-    && mkdir build && cd build \
-    && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-    && make -j && make install && make clean \
-    && cd $ROOTDIR && rm -Rf src/openjpeg*
+    cd $ROOTDIR/src && \
+    wget https://github.com/uclouvain/openjpeg/archive/v${OPENJPEG_VERSION}.tar.gz && \
+    tar -xvf v${OPENJPEG_VERSION}.tar.gz && \
+    cd openjpeg-${OPENJPEG_VERSION}/ && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$ROOTDIR && \
+    make -j && \
+    make install && \
+    rm -Rf $ROOTDIR/src/openjpeg* $ROOTDIR/src/v${OPENJPEG_VERSION}.tar.gz
 
 # Compile and install GDAL
-ADD http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz $ROOTDIR/src/
 # FYI, GDAL fails to compile with make -j
 RUN \
-    cd src && tar -xvf gdal-${GDAL_VERSION}.tar.gz && cd gdal-${GDAL_VERSION} && \
+    cd $ROOTDIR/src && \
+    wget http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz && \
+    tar -xvf gdal-${GDAL_VERSION}.tar.gz && \
+    cd gdal-${GDAL_VERSION} && \
     ./configure \
         --with-python \
         --with-curl \
@@ -83,45 +92,10 @@ RUN \
         --with-libtiff=internal \
         --with-libz=internal \
         --with-threads \
-        --without-bsb \
-        --without-cfitsio \
-        --without-cryptopp \
-        --without-ecw \
-        --without-expat \
-        --without-fme \
-        --without-freexl \
-        --without-gif \
-        --without-gnm \
-        --without-grass \
-        --without-grib \
-        --without-idb \
-        --without-ingres \
-        --without-jasper \
+        --with-mrf \
         --without-jp2mrsid \
-        --without-jpeg \
-        --without-kakadu \
-        --without-libgrass \
-        --without-libkml \
-        --without-libtool \
-        --without-mrf \
-        --without-mrsid \
-        --without-mysql \
         --without-netcdf \
-        --without-odbc \
-        --without-ogdi \
-        --without-pcidsk \
-        --without-pcraster \
-        --without-pcre \
-        --without-perl \
-        --without-pg \
-        --without-php \
-        --without-png \
-        --without-qhull \
-        --without-sde \
-        --without-sqlite3 \
-        --without-webp \
-        --without-xerces \
-        --without-xml2 \
+        --without-ecw \
     && \
     make && \
     make install && \
@@ -133,7 +107,7 @@ RUN \
    # python3 setup.py install && \
     rm -Rf $ROOTDIR/src/gdal*
 
-# java repos
+# Install JDK
 RUN \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends oracle-java8-installer && \
     apt-get clean all
@@ -144,7 +118,7 @@ RUN \
   echo >> /root/.bashrc && \
   echo "export PATH=~/scala-$SCALA_VERSION/bin:$PATH" >> /root/.bashrc
 
-# Install sbt
+# Install SBT
 RUN \
   curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
   dpkg -i sbt-$SBT_VERSION.deb && \
