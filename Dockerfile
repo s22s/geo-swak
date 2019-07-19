@@ -3,7 +3,7 @@ FROM ubuntu:cosmic
 
 # UTF-8 all the things
 RUN \
-    apt-get clean -y && apt-get update -y && \
+    apt-get clean -y && apt-get update && \
     apt-get install -y apt-utils locales && \
     locale-gen en_US.UTF-8 && \
     apt-get clean all
@@ -15,27 +15,19 @@ ENV ROOTDIR /usr/local/
 # OPENJPEG versions prior to 2.3.0 have problems processing large jp2 files
 # https://lists.osgeo.org/pipermail/gdal-dev/2017-October/047397.html
 ENV OPENJPEG_VERSION 2.3.0
-ENV GDAL_VERSION 2.3.2
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
-# ENV SCALA_VERSION ${SCALA_VERSION:-2.12.6}
-ENV SCALA_VERSION 2.12.7
-ENV SBT_VERSION 1.2.4
+ENV GDAL_VERSION 2.3.3
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+ENV SCALA_VERSION 2.12.8
+ENV SBT_VERSION 1.2.8
 
 # Load assets
 WORKDIR $ROOTDIR/
 
 RUN \
-    apt-get install -y software-properties-common python3-software-properties && \
-    apt-get clean all
-
-RUN \
-    echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections && \
-    echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-
-RUN \
-    apt-get update -y && \
+    apt-get update && \
     apt-get install -y \
+        software-properties-common \
+        python3-software-properties \
         gcc \
         g++ \
         curl \
@@ -55,6 +47,9 @@ RUN \
         imagemagick \
         libpng-dev \
         wget \
+        swig \
+        ant \
+        openjdk-8-jdk-headless \
     && apt-get clean all
 
 # Install Pip and AWS CLI
@@ -74,14 +69,16 @@ RUN \
     rm -Rf $ROOTDIR/src/openjpeg* $ROOTDIR/src/v${OPENJPEG_VERSION}.tar.gz
 
 # Compile and install GDAL
-# FYI, GDAL fails to compile with make -j
+# HDF4 - included, used by MODIS
+# JPEG2000 - openjpeg, used by Sentinel-2
+# MRF - included, used by NAIP
+# GeoTIFF - included, use internal version
 RUN \
     cd $ROOTDIR/src && \
     wget http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz && \
     tar -xvf gdal-${GDAL_VERSION}.tar.gz && \
     cd gdal-${GDAL_VERSION} && \
     ./configure \
-        --with-python \
         --with-curl \
         --with-openjpeg \
         --with-hdf4 \
@@ -96,21 +93,7 @@ RUN \
         --without-jp2mrsid \
         --without-netcdf \
         --without-ecw \
-    && \
-    make && \
-    make install && \
-    ldconfig && \
-    apt-get remove -y --purge build-essential && \
-    apt-get autoremove -y && apt-get clean all && \
-   # cd $ROOTDIR/src/gdal-${GDAL_VERSION}/swig/python && \
-   # python3 setup.py build && \
-   # python3 setup.py install && \
-    rm -Rf $ROOTDIR/src/gdal*
-
-# Install JDK
-RUN \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends oracle-java8-installer && \
-    apt-get clean all
+        --with-java=$JAVA_HOME 
 
 # Install Scala
 RUN \
@@ -127,7 +110,9 @@ RUN \
   apt-get clean all && \
   sbt sbtVersion
 
-# Scala expects this file
+RUN apt-get install git
+
+# Scala expects this file, make sure it exists
 RUN mkdir -p /usr/lib/jvm/java-8-openjdk-amd64 && touch /usr/lib/jvm/java-8-openjdk-amd64/release
 
 # Final apt-get cleanup
