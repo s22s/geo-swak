@@ -1,7 +1,7 @@
 # Astraea Geo Swiss Army Knife Docker Images
 
 This Dockerfile creates and image with the following:
-* Ubuntu 16.04 (Xenial Xerus)
+* Ubuntu 18.04 (Cosmic Cuttlefish)
 * GDAL, compiled with HDF4, HDF5, and JPEG2000 (OpenJPEG) support
 * Java JRE 8
 * Scala and SBT
