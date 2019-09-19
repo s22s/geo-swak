@@ -21,7 +21,7 @@ Images generated from this build are published to [https://hub.docker.com/r/s22s
 
 ### Build
 
-    $ docker build -t s22s/geo-swak:latest . 
+    $ docker build --no-cache -t s22s/geo-swak:latest .
     Sending build context to Docker daemon  105.5kB
     Step 1/27 : FROM ubuntu:xenial
     ...

@@ -13,7 +13,7 @@ sudo mkdir -p /data
 sudo chmod 777 /data
 sudo chown ec2-user /data
 
-echo "*   hard  nofile  65535" | tee --append /etc/security/limits.conf
-echo "*   soft  nofile  65535" | tee --append /etc/security/limits.conf
+echo "*   hard  nofile  65535" | sudo tee --append /etc/security/limits.conf
+echo "*   soft  nofile  65535" | sudo tee --append /etc/security/limits.conf
 
 sudo reboot

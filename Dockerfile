@@ -15,7 +15,7 @@ ENV ROOTDIR /usr/local/
 # OPENJPEG versions prior to 2.3.0 have problems processing large jp2 files
 # https://lists.osgeo.org/pipermail/gdal-dev/2017-October/047397.html
 ENV OPENJPEG_VERSION 2.3.0
-ENV GDAL_VERSION 2.3.3
+ENV GDAL_VERSION 2.4.2
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 ENV SCALA_VERSION 2.12.8
 ENV SBT_VERSION 1.2.8
@@ -50,6 +50,7 @@ RUN \
         swig \
         ant \
         openjdk-8-jdk-headless \
+        git \
     && apt-get clean all
 
 # Install Pip and AWS CLI
@@ -93,7 +94,17 @@ RUN \
         --without-jp2mrsid \
         --without-netcdf \
         --without-ecw \
-        --with-java=$JAVA_HOME 
+        --with-java=$JAVA_HOME \
+    && \
+    make -j4 && \
+    make install && \
+    ldconfig && \
+    apt-get remove -y --purge build-essential && \
+    apt-get autoremove -y && apt-get clean all && \
+   # cd $ROOTDIR/src/gdal-${GDAL_VERSION}/swig/python && \
+   # python3 setup.py build && \
+   # python3 setup.py install && \
+    rm -Rf $ROOTDIR/src/gdal*
 
 # Install Scala
 RUN \
@@ -109,8 +120,6 @@ RUN \
   apt-get install sbt && \
   apt-get clean all && \
   sbt sbtVersion
-
-RUN apt-get install git
 
 # Scala expects this file, make sure it exists
 RUN mkdir -p /usr/lib/jvm/java-8-openjdk-amd64 && touch /usr/lib/jvm/java-8-openjdk-amd64/release
