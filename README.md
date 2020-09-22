@@ -21,13 +21,8 @@ Images generated from this build are published to [https://hub.docker.com/r/s22s
 
 ### Build
 
-    $ docker build --no-cache -t s22s/geo-swak:latest .
-    Sending build context to Docker daemon  105.5kB
-    Step 1/27 : FROM ubuntu:xenial
-    ...
-    Successfully built ea85116c15b1
-    Successfully tagged s22s/geo-swak:latest
-    $ docker push s22s/geo-swak
+    make build
+    make push
 
 ### Run
 
@@ -73,6 +68,10 @@ Bash functions can make the GDAL tools run as if they were installed locally.  A
 
 function g {
   docker run -it -v $(pwd):/data s22s/geo-swak "$@"
+}
+
+function vcog {
+  g vcog.py "$@"
 }
 
 function gdalinfo {
